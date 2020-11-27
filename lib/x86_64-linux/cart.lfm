@@ -1,0 +1,100 @@
+object FormCart: TFormCart
+  Left = 332
+  Height = 496
+  Top = 218
+  Width = 618
+  Caption = 'FormCart'
+  ClientHeight = 496
+  ClientWidth = 618
+  OnShow = FormShow
+  LCLVersion = '2.0.10.0'
+  object Edit1: TEdit
+    Left = 0
+    Height = 26
+    Top = 8
+    Width = 608
+    OnKeyUp = Edit1KeyUp
+    TabOrder = 0
+    Text = 'Edit1'
+  end
+  object Button1: TButton
+    Left = 533
+    Height = 25
+    Top = 448
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'OK'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+  object DBGrid1: TDBGrid
+    Left = 8
+    Height = 384
+    Top = 48
+    Width = 600
+    Color = clWindow
+    Columns = <    
+      item
+        Title.Caption = 'sku'
+        Width = 150
+        FieldName = 'sku'
+      end    
+      item
+        Title.Caption = 'name'
+        Width = 255
+        FieldName = 'name'
+      end>
+    DataSource = DataSource1
+    TabOrder = 2
+  end
+  object Button2: TButton
+    Left = 456
+    Height = 25
+    Top = 448
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'Form 2'
+    OnClick = Button2Click
+    TabOrder = 3
+  end
+  object Label1: TLabel
+    Left = 112
+    Height = 17
+    Top = 456
+    Width = 43
+    Caption = 'TOTAL:'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 168
+    Height = 12
+    Top = 461
+    Width = 7
+    Caption = '0'
+    Font.Height = -13
+    Font.Name = 'Sans'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object MemDataset1: TMemDataset
+    FieldDefs = <    
+      item
+        Name = 'sku'
+        DataType = ftString
+        Size = 10
+      end    
+      item
+        Name = 'name'
+        DataType = ftString
+        Size = 100
+      end>
+    Left = 40
+    Top = 440
+  end
+  object DataSource1: TDataSource
+    DataSet = MemDataset1
+    Left = 80
+    Top = 112
+  end
+end
