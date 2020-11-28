@@ -10,8 +10,9 @@ uses
 type
   { TCartModel }
   TProduct = record
-    Sku: string;
-    Name: string;
+    Sku: String;
+    Name: String;
+    Price: Double;
   end;
 
   TProductItemModel = specialize TItem<TProduct>;
