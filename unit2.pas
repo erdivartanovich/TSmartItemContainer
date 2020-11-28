@@ -23,6 +23,7 @@ type
 
   public
     Cart: TCartModel;
+    Store: TStoreModel;
     procedure LogCartUpdated(Items: TArrayItem; Aggregates: TAggregateDictionary);
 
   end;
@@ -44,13 +45,12 @@ end;
 
 procedure TForm2.FormCreate(Sender: TObject);
 begin
-  Cart := TCartModel.Create;
-  Cart.OnUpdate := @LogCartUpdated;
+  //Cart := TCartModel.Create;
+  //Cart.OnUpdate[1] := @LogCartUpdated;
 end;
 
 procedure TForm2.LogCartUpdated(Items: TArrayItem; Aggregates: TAggregateDictionary);
 var
-  I: integer;
   Total: double;
 begin
   WriteLn('Form2 ====> Cart updated');

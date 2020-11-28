@@ -10,25 +10,17 @@ uses
 type
   { TCartModel }
   TProduct = record
-    sku: string;
+    Sku: string;
     Name: string;
   end;
 
   TProductItemModel = specialize TItem<TProduct>;
-  TCartModel = specialize TItemContainer<TProductItemModel>;
+  TCartModel = specialize TAggregatedItemContainer<TProductItemModel>;
+  TStoreModel = specialize TItemContainer<TCartModel>;
   TArrayItem = array of TProductItemModel;
 
-  {CartListener}
-  TCartListener = class(TObject)
-  private
-    procedure ListenForUpdate(Items: TArrayItem; Aggregates: TAggregateDictionary);
-  end;
 
 implementation
 
-procedure TCartListener.ListenForUpdate(Items: TArrayItem; Aggregates: TAggregateDictionary);
-begin
-
-end;
 
 end.

@@ -28,6 +28,7 @@ type
 
   private
     FCart: TCartModel;
+    FState: TObjectDictionary;
     procedure LogCartUpdated(Items: TArrayItem; Aggregates: TAggregateDictionary);
     procedure ClearInputs();
 
@@ -60,19 +61,22 @@ end;
 
 procedure TFormCart.Edit1KeyUp(Sender: TObject; var Key: word);
 var
-  product: string;
   ProductItem: TProductItemModel;
+  product: String;
 begin
   if IntToStr(Key) = '13' then
   begin
     product := Edit1.Text;
     Edit1.Text := '';
     try
-      ProductItem := TProductItemModel.Create;
-      ProductItem.Entity.sku := '001';
-      ProductItem.Entity.Name := product;
+      ProductItem := TProductItemModel.Create('001');
+      ProductItem.Entity.Sku:= '001';
+      ProductItem.Entity.Name:= product;
       ProductItem.AddAggregate('Total', 1000);
       FCart.Add(ProductItem);
+      FState := TObjectDictionary.Create;
+      FState.Add('Cart', FCart);
+      Form2.Store.State := FState;
     finally
 
     end;
@@ -82,9 +86,13 @@ end;
 
 procedure TFormCart.FormShow(Sender: TObject);
 begin
+  Form2.Store := TStoreModel.Create;
+  Form2.Cart := TCartModel.Create;
+  Form2.Cart.OnUpdate := @Form2.LogCartUpdated;
+  Form2.Cart.OnUpdate := @LogCartUpdated;
   FCart :=  TCartModel.Create;
   FCart := Form2.Cart;
-  FCart.OnUpdate := @LogCartUpdated;
+
   ClearInputs;
   with MemDataset1 do
   begin
@@ -109,7 +117,6 @@ var
   Total: double;
 begin
   WriteLn('Cart updated');
-  //if MemDataset1.RecordSize > 0 then
   MemDataset1.Clear(False);
   for I := 0 to Length(Items) - 1 do
   begin

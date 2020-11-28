@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, tachartlazaruspkg, runtimetypeinfocontrols, memdslaz, cart, CartModel,
-  ItemContainer, unit2;
+  ItemContainer, unit2, StoreModel;
 
 {$R *.res}
 
