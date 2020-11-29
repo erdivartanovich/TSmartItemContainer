@@ -1,3 +1,10 @@
+{
+ OBSERVABLE AGGREGATED ITEM CONTAINER & EVENT CONTAINER
+ Copyright (c) 2020 by Erdivartanovich ( https://erdivartanovich.github.io/aboutme )
+ License: MIT
+}
+
+
 unit ItemContainer;
 
 {$mode objfpc}{$H+}
@@ -10,7 +17,10 @@ uses
 type
   TObjectDictionary = specialize TObjectDictionary<string, TObject>;
   TAggregateDictionary = specialize TObjectDictionary<string, double>;
-  TAggregateMethod = (Sum, Avg, Max, Min);
+  {
+   === WILL APPLIED ===
+   TAggregateMethod = (Sum, Avg, Max, Min);
+  }
 
   TAggregateField = record
     Key: string;
@@ -39,8 +49,7 @@ type
     type
     TArrayItem = array of TItem;
     TItemMap = specialize TObjectHashMap<string, TItem>;
-    TUpdateEvent =
-    procedure(Items: TArrayItem; Aggregates: TAggregateDictionary) of object;
+    TUpdateEvent = procedure(Items: TArrayItem; Aggregates: TAggregateDictionary) of object;
     TUpdateEventListeners = array of TUpdateEvent;
   private
     FItems: TArrayItem;
@@ -54,10 +63,13 @@ type
     property Items: TArrayItem read GetItems;
     property Agregates: TAggregateDictionary read GetAggregates;
     property OnUpdate: TUpdateEvent write SetOnUpdate;
+    constructor Create;
     procedure Add(Value: TItem);
     procedure Delete(ItemId: string);
+    procedure Clear;
+    procedure Subscribe(ASubscriber: TUpdateEvent);
     { Triggers the event if anything is pushed to container }
-    procedure TriggerEvent();
+    procedure Observe;
   end;
 
   { TItemContainer }
@@ -79,6 +91,18 @@ type
     property State: TObjectDictionary read GetState write SetState;
   end;
 
+  { TEventContainer }
+  TEventContainer = class
+    type
+    TEventHandler = procedure(AData: TObject) of object;
+    TEventMap = specialize TObjectHashMap<string, TEventHandler>;
+  private
+    FEventMap: TEventMap;
+  public
+    constructor Create;
+    procedure On(EventName: String; EventHandler: TEventHandler);
+    procedure Emit(EventName: String; AData: TObject);
+  end;
 
 
 implementation
@@ -122,6 +146,11 @@ begin
   Result := Self.FAggregateFields;
 end;
 
+constructor TAggregatedItemContainer.Create;
+begin
+  if not Assigned(FItemMap) then
+    FItemMap := TItemMap.Create;
+end;
 
 function TAggregatedItemContainer.GetItems(): TArrayItem;
 var
@@ -171,8 +200,6 @@ const
   Val: double = 0;
   NewVal: double = 0;
 begin
-  if not Assigned(FItemMap) then
-    FItemMap := TItemMap.Create;
   FItemMap.TryGetValue(Value.id, ExistingItem);
   if Assigned(ExistingItem) then
   begin
@@ -191,12 +218,19 @@ begin
     end;
   end;
   FItemMap.AddOrSetValue(Value.Id, Value);
-  TriggerEvent;
+  Observe;
 end;
 
 procedure TAggregatedItemContainer.Delete(ItemId: string);
 begin
   FItemMap.Remove(ItemId);
+  Observe;
+end;
+
+procedure TAggregatedItemContainer.Clear();
+begin
+  FItemMap.Clear;
+  Observe;
 end;
 
 procedure TAggregatedItemContainer.SetOnUpdate(Ev: TUpdateEvent);
@@ -205,9 +239,12 @@ begin
   FEvents[Length(FEvents) - 1] := Ev;
 end;
 
+procedure TAggregatedItemContainer.Subscribe(ASubscriber: TUpdateEvent);
+begin
+  Self.SetOnUpdate(ASubscriber);
+end;
 
-
-procedure TAggregatedItemContainer.TriggerEvent;
+procedure TAggregatedItemContainer.Observe;
 var
   I: integer;
 begin
@@ -242,6 +279,26 @@ begin
     Result := FStates[Length(FStates) - 1]
   else
     Result := nil;
+end;
+
+constructor TEventContainer.Create;
+begin
+  if not Assigned(FEventMap) then
+    FEventMap := TEventMap.Create;
+end;
+
+procedure TEventContainer.On(EventName: String; EventHandler: TEventHandler);
+begin
+  FEventMap.AddOrSetValue(EventName, EventHandler);
+end;
+
+procedure TEventContainer.Emit(EventName: String; AData: TObject);
+Var
+  EventHandler: TEventHandler;
+begin
+  FEventMap.TryGetValue(EventName, EventHandler);
+  If Assigned(EventHandler) then
+     EventHandler(AData);
 end;
 
 end.

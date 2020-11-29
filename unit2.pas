@@ -45,17 +45,17 @@ end;
 
 procedure TForm2.FormCreate(Sender: TObject);
 begin
-  //Cart := TCartModel.Create;
-  //Cart.OnUpdate[1] := @LogCartUpdated;
+
 end;
 
 procedure TForm2.LogCartUpdated(Items: TArrayItem; Aggregates: TAggregateDictionary);
 var
-  Total: double;
+  Total, Qty: double;
 begin
-  WriteLn('Form2 ====> Cart updated');
+  WriteLn('======>', '[Form2] Cart updated');
   Aggregates.TryGetValue('Total', Total);
-  Label4.Caption := IntToStr(Length(Items));
+  Aggregates.TryGetValue('Qty', Qty);
+  Label4.Caption := FloatToStr(Qty);
   Label2.Caption := FloatToStr(Total);
 end;
 

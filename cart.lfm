@@ -2,36 +2,38 @@ object FormCart: TFormCart
   Left = 332
   Height = 496
   Top = 218
-  Width = 944
+  Width = 957
   Caption = 'FormCart'
   ClientHeight = 496
-  ClientWidth = 944
+  ClientWidth = 957
   OnShow = FormShow
   LCLVersion = '2.0.10.0'
   object Edit1: TEdit
-    Left = 0
+    Left = 16
     Height = 26
-    Top = 8
+    Top = 11
     Width = 608
+    Anchors = [akTop, akLeft, akRight]
     OnKeyUp = Edit1KeyUp
     TabOrder = 0
     Text = 'Edit1'
   end
   object Button1: TButton
-    Left = 859
+    Left = 872
     Height = 25
-    Top = 448
+    Top = 144
     Width = 75
-    Anchors = [akRight, akBottom]
-    Caption = 'OK'
+    Anchors = [akTop, akRight]
+    Caption = 'DELETE ALL'
     OnClick = Button1Click
     TabOrder = 1
   end
   object DBGrid1: TDBGrid
-    Left = 8
+    Left = 16
     Height = 384
     Top = 48
-    Width = 896
+    Width = 848
+    Anchors = [akTop, akLeft, akRight, akBottom]
     Color = clWindow
     Columns = <    
       item
@@ -63,57 +65,100 @@ object FormCart: TFormCart
     TabOrder = 2
   end
   object Button2: TButton
-    Left = 782
+    Left = 859
     Height = 25
-    Top = 448
-    Width = 75
+    Top = 456
+    Width = 88
     Anchors = [akRight, akBottom]
-    Caption = 'Form 2'
+    Caption = 'CheckOut'
     OnClick = Button2Click
     TabOrder = 3
   end
   object Label1: TLabel
-    Left = 112
-    Height = 17
-    Top = 448
-    Width = 43
+    Left = 780
+    Height = 21
+    Top = 16
+    Width = 80
+    Anchors = [akTop, akRight]
+    AutoSize = False
     Caption = 'TOTAL:'
+    Font.Height = -20
+    Font.Name = 'Sans'
+    Font.Style = [fsBold]
     ParentColor = False
+    ParentFont = False
   end
   object Label2: TLabel
-    Left = 168
-    Height = 12
-    Top = 453
-    Width = 7
+    Left = 868
+    Height = 20
+    Top = 16
+    Width = 79
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight]
+    AutoSize = False
     Caption = '0'
-    Font.Height = -13
+    Font.Height = -20
     Font.Name = 'Sans'
     Font.Style = [fsBold]
     ParentColor = False
     ParentFont = False
   end
   object Label3: TLabel
-    Left = 112
-    Height = 17
-    Top = 472
-    Width = 71
-    Caption = 'TOTAL QTY:'
-    ParentColor = False
-  end
-  object Label4: TLabel
-    Left = 196
-    Height = 12
-    Top = 477
-    Width = 7
-    Caption = '0'
-    Font.Height = -13
+    Left = 659
+    Height = 19
+    Top = 16
+    Width = 57
+    Anchors = [akTop, akRight]
+    AutoSize = False
+    Caption = 'QTY:'
+    Font.Height = -20
     Font.Name = 'Sans'
     Font.Style = [fsBold]
     ParentColor = False
     ParentFont = False
   end
+  object Label4: TLabel
+    Left = 699
+    Height = 19
+    Top = 16
+    Width = 64
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight]
+    AutoSize = False
+    Caption = '0'
+    Font.Height = -20
+    Font.Name = 'Sans'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Button3: TButton
+    Left = 872
+    Height = 25
+    Top = 104
+    Width = 75
+    Anchors = [akTop, akRight]
+    Caption = 'Delete'
+    OnClick = Button3Click
+    TabOrder = 4
+  end
+  object Button4: TButton
+    Left = 872
+    Height = 25
+    Top = 64
+    Width = 75
+    Anchors = [akTop, akRight]
+    Caption = 'REFRESH'
+    OnClick = Button4Click
+    TabOrder = 5
+  end
   object MemDataset1: TMemDataset
     FieldDefs = <    
+      item
+        Name = 'Id'
+        DataType = ftString
+        Size = 255
+      end    
       item
         Name = 'sku'
         DataType = ftString

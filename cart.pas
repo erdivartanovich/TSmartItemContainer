@@ -15,6 +15,8 @@ type
 
     Button1: TButton;
     Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
     DataSource1: TDataSource;
     DBGrid1: TDBGrid;
     Edit1: TEdit;
@@ -25,15 +27,18 @@ type
     MemDataset1: TMemDataset;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
     procedure Edit1KeyUp(Sender: TObject; var Key: word);
     procedure FormShow(Sender: TObject);
 
   private
     FCart: TCartModel;
     FState: TObjectDictionary;
+    FEventContainer: TEventContainer;
     procedure LogCartUpdated(Items: TArrayItem; Aggregates: TAggregateDictionary);
     procedure ClearInputs();
-
+    procedure UpdateView(AData: TObject);
   public
 
 
@@ -49,15 +54,28 @@ implementation
 
 { TFormCart }
 
-
-procedure TFormCart.Button1Click(Sender: TObject);
-begin
-  ClearInputs;
-end;
-
 procedure TFormCart.Button2Click(Sender: TObject);
 begin
   Form2.Show;
+end;
+
+procedure TFormCart.Button1Click(Sender: TObject);
+begin
+  MemDataset1.Clear(false);
+  FCart.Clear;
+end;
+
+procedure TFormCart.Button3Click(Sender: TObject);
+Var DeletedId: String;
+begin
+   WriteLn('[Form1] ===> ' , 'DeletedId: ', MemDataset1.FieldValues['Id']);
+   DeletedId := MemDataset1.FieldValues['Id'];
+   FCart.Delete(DeletedId);
+end;
+
+procedure TFormCart.Button4Click(Sender: TObject);
+begin
+  FCart.Observe;
 end;
 
 
@@ -75,10 +93,10 @@ begin
     try
       {
        If Item identifier is not provided like
-       "
+       ==============================================
           ProductItem := TProductItemModel.Create();
-       "
-       Then GUID will be used as identifier there for the item will be never duplicated.
+       ==============================================
+       Then GUID will be used as identifier therefore the item will be never duplicated.
        If identifier is provided, item will be accumulated
       }
       ProductItem := TProductItemModel.Create(Product);
@@ -100,13 +118,16 @@ end;
 
 procedure TFormCart.FormShow(Sender: TObject);
 begin
+  {INIT CART CONTAINER}
   Form2.Store := TStoreModel.Create;
   Form2.Cart := TCartModel.Create;
-  Form2.Cart.OnUpdate := @Form2.LogCartUpdated;
-  Form2.Cart.OnUpdate := @LogCartUpdated;
+  Form2.Cart.Subscribe(@LogCartUpdated);
+  Form2.Cart.Subscribe(@Form2.LogCartUpdated);
+
   FCart := TCartModel.Create;
   FCart := Form2.Cart;
 
+  {PREPARE COMPONENTS}
   ClearInputs;
   with MemDataset1 do
   begin
@@ -114,6 +135,13 @@ begin
     Open;
   end;
 
+  {PREPARE EVENT CONTAINER}
+  FEventContainer :=  TEventContainer.Create;
+  // Add event listener
+  FEventContainer.On('CartUpdated', @UpdateView);
+
+  {FIRE CART CONTAINER OBSERVE EVENT}
+  FCart.Observe;
 end;
 
 procedure TFormCart.ClearInputs();
@@ -130,12 +158,12 @@ var
   I: integer;
   Total, SubTotal, Qty: double;
 begin
-  WriteLn('Cart updated');
   MemDataset1.Clear(False);
   for I := 0 to Length(Items) - 1 do
   begin
     MemDataset1.Append;
-    MemDataset1.FieldByName('sku').Value := Items[I].Entity.sku;
+    MemDataset1.FieldByName('Id').Value := Items[I].Id;
+    MemDataset1.FieldByName('sku').Value := Items[I].Entity.Sku;
     MemDataset1.FieldByName('name').Value := Items[I].Entity.Name;
     MemDataset1.FieldByName('price').Value := Items[I].Entity.price;
     Items[I].Aggregate.TryGetValue('Total', SubTotal);
@@ -144,11 +172,22 @@ begin
     MemDataset1.FieldByName('qty').Value := Qty;
     MemDataset1.Post;
   end;
-  //WriteLn('Total');
   Aggregates.TryGetValue('Total', Total);
   Aggregates.TryGetValue('Qty', Qty);
   Label2.Caption := FloatToStr(Total);
   Label4.Caption := FloatToStr(Qty);
+  FEventContainer.Emit('CartUpdated', nil);
+
+  WriteLn('[Form1] Cart updated');
+end;
+
+procedure TFormCart.UpdateView(AData: TObject);
+Var bEnabled: Boolean;
+begin
+  WriteLn('[Form1] Handle Update View');
+  bEnabled := MemDataset1.DataSize > 0;
+  Button1.Enabled := bEnabled;
+  Button3.Enabled :=  bEnabled;
 end;
 
 end.
